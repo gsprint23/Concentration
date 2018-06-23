@@ -13,6 +13,7 @@ class ConcentrationViewController: UIViewController {
     // ! doesn't have to be initialized
     // no error saying we need an init()
     @IBOutlet weak var flipCountLabel: UILabel!
+    @IBOutlet weak var scoreLabel: UILabel!
     
     // outlet collection
     // array of UIButtons
@@ -20,15 +21,21 @@ class ConcentrationViewController: UIViewController {
     
     // lazy doesnt actually initialize until some one tries to use game
     // lazy cannot have property observer (the didSet)
-    lazy var game = ConcentrationModel(numberOfPairsOfCards: (cardButtons.count + 1) / 2)
+    lazy var game = ConcentrationModel(numberOfPairsOfCards: 2)
 
+    var emoji = Dictionary<Int, String>()
+    var emojiChoices = [String]()
     
-    var flipCount: Int = 0 {
-        didSet {
-            // property observer
-            // keep UI in sync with instance variables of our class
-            flipCountLabel.text = "Flips: \(flipCount)"
-        }
+//    var flipCount: Int = 0 {
+//        didSet {
+//            // property observer
+//            // keep UI in sync with instance variables of our class
+//            flipCountLabel.text = "Flips: \(flipCount)"
+//        }
+//    }
+    
+    override func viewDidLoad() {
+        newGame()
     }
 
     @IBAction func touchCard(_ sender: UIButton) {
@@ -36,7 +43,7 @@ class ConcentrationViewController: UIViewController {
         if let cardNumber = cardButtons.index(of: sender) {
             print(cardNumber)
             game.chooseCard(at: cardNumber)
-            flipCount += 1
+            game.flipCount += 1
             updateViewFromModel()
         }
         else {
@@ -57,10 +64,10 @@ class ConcentrationViewController: UIViewController {
                 button.backgroundColor = card.matched ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0) : #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
             }
         }
+        flipCountLabel.text = "Flips: \(game.flipCount)"
+        scoreLabel.text = "Score: \(game.score)"
     }
-    
-    var emoji = Dictionary<Int, String>()
-    var emojiChoices = ["🍉", "🥝", "🍇", "🍋", "🍓", "🥥", "🍊", "🍏"]
+
     
     func emoji(for card: Card) -> String {
         
@@ -84,5 +91,17 @@ class ConcentrationViewController: UIViewController {
         return emoji[card.identifier] ?? "?"
     }
     
+    func newGame() {
+        emojiChoices = ["🍉", "🥝", "🍇", "🍋", "🍓", "🥥", "🍊", "🍏"]
+        emoji = Dictionary<Int, String>()
+        game = ConcentrationModel(numberOfPairsOfCards: (cardButtons.count + 1) / 2)
+        
+        updateViewFromModel()
+        
+    }
+    
+    @IBAction func newGamePressed(_ sender: UIButton) {
+        newGame()
+    }
 }
 

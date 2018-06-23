@@ -24,6 +24,7 @@ struct Card {
     var isFaceUp = false
     var matched = false
     var identifier: Int
+    var flippedBefore = false
     
     static var identifierFactory = 0
     

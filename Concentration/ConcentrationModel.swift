@@ -15,6 +15,9 @@ class ConcentrationModel {
     
     var indexOfOneAndOnlyFaceUpCard: Int?
     
+    var flipCount = 0
+    var score = 0
+    
     // classes get free init as long as all properties are initialized
     
     init(numberOfPairsOfCards: Int) {
@@ -32,7 +35,8 @@ class ConcentrationModel {
         // shuffle the cards
         shuffleCards()
         
-        
+        flipCount = 0
+        score = 0
         
     }
     
@@ -53,6 +57,8 @@ class ConcentrationModel {
                 if cards[matchIndex].identifier == cards[index].identifier{
                     cards[matchIndex].matched = true
                     cards[index].matched = true
+                    // 2 points for every match
+                    score += 2
                 }
                 cards[index].isFaceUp = true
                 // no longer just one card face up
