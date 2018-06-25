@@ -34,6 +34,7 @@ class ConcentrationModel {
                 cards[index].isFaceUp = (index == newValue)
             }
         }
+        
     }
     
     var flipCount = 0
@@ -82,6 +83,17 @@ class ConcentrationModel {
                     cards[index].matched = true
                     // 2 points for every match
                     score += 2
+                }
+                else {
+                    // mismatch
+                    if cards[matchIndex].flippedBefore {
+                        score -= 1
+                    }
+                    if cards[index].flippedBefore {
+                        score -= 1
+                    }
+                    cards[index].flippedBefore = true
+                    cards[matchIndex].flippedBefore = true
                 }
                 cards[index].isFaceUp = true
             }

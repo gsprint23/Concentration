@@ -101,7 +101,7 @@ class ConcentrationViewController: UIViewController {
     }
     
     private func newGame() {
-        emojiChoices = ["🍉", "🥝", "🍇", "🍋", "🍓", "🥥", "🍊", "🍏"]
+        emojiChoices = Theme.getTheme()
         emoji = Dictionary<Int, String>()
         game = ConcentrationModel(numberOfPairsOfCards: numberOfPairsOfCards)
         
