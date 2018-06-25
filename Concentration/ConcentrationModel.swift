@@ -8,26 +8,21 @@
 
 import Foundation
 
-class ConcentrationModel {
+struct ConcentrationModel {
     
     private(set) var cards = Array<Card>() // initialize to empty array
     // var cards = [Card]()
     
+    // swift knows this has set so it is mutatable (also it is a var, not a let)
+    // only have to put mutatable on funcs in a struct
+    // structs are value types, don't live in the heap, as it is passed around it gets copied (only copies when you mutate it, copy on write semantics)
     private var indexOfOneAndOnlyFaceUpCard: Int? {
         get {
-            var foundIndex: Int?
-            for index in cards.indices {
-                if cards[index].isFaceUp {
-                    if foundIndex == nil {
-                        foundIndex = index
-                    }
-                    else {
-                        // found more than one card face up
-                        return nil
-                    }
-                }
+            let faceUpCardIndices = cards.indices.filter {
+                // boolean function
+                cards[$0].isFaceUp
             }
-            return foundIndex
+            return faceUpCardIndices.oneAndOnly
         }
         set(newValue) {
             for index in cards.indices {
@@ -63,7 +58,7 @@ class ConcentrationModel {
         
     }
     
-    func shuffleCards() {
+    mutating func shuffleCards() {
         var shuffledArray = [Card]()
         repeat {
             let randomIndex = Int(arc4random_uniform(UInt32(cards.count)))
@@ -72,13 +67,13 @@ class ConcentrationModel {
         cards = shuffledArray
     }
     
-    func chooseCard(at index: Int) {
+    mutating func chooseCard(at index: Int) {
         assert(cards.indices.contains(index), "Concentration.chooseCard(at: \(index)): chosen index not in the cards array")
         //cards[index].isFaceUp = !cards[index].isFaceUp
         if !cards[index].matched {
             if let matchIndex = indexOfOneAndOnlyFaceUpCard, matchIndex != index {
                 // check if cards match
-                if cards[matchIndex].identifier == cards[index].identifier{
+                if cards[matchIndex] == cards[index] {
                     cards[matchIndex].matched = true
                     cards[index].matched = true
                     // 2 points for every match
@@ -103,5 +98,12 @@ class ConcentrationModel {
                 indexOfOneAndOnlyFaceUpCard = index
             }
         }
+    }
+}
+
+// extending a protocol
+extension Collection {
+    var oneAndOnly: Element? {
+        return count == 1 ? first : nil
     }
 }

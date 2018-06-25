@@ -20,11 +20,16 @@ import Foundation
 // references live in the heap, not passing around the objecct -> passing around pointers
 
 
-struct Card {
+struct Card: Hashable {
     var isFaceUp = false
     var matched = false
-    var identifier: Int
+    private var identifier: Int
     var flippedBefore = false
+    
+    // for Hashable protocol
+    var hashValue: Int {
+        return identifier
+    }
     
     private static var identifierFactory = 0
     
@@ -44,5 +49,10 @@ struct Card {
     // has the same internal and external parameter names
     init() {
         self.identifier = Card.getUniqueIdentifier()
+    }
+    
+    // for Equatable protoocl
+    static func ==(lhs: Card, rhs: Card) -> Bool {
+        return lhs.identifier == rhs.identifier
     }
 }

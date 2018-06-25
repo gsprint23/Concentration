@@ -32,8 +32,8 @@ class ConcentrationViewController: UIViewController {
         }
     }
 
-    private var emoji = Dictionary<Int, String>()
-    private var emojiChoices = [String]()
+    private var emoji = Dictionary<Card, String>()
+    private var emojiChoices = String()
     
 //    var flipCount: Int = 0 {
 //        didSet {
@@ -73,7 +73,13 @@ class ConcentrationViewController: UIViewController {
                 button.backgroundColor = card.matched ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0) : #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
             }
         }
-        flipCountLabel.text = "Flips: \(game.flipCount)"
+        let attributes: [NSAttributedStringKey : Any] = [
+            .strokeWidth : 5.0,
+            .strokeColor : #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
+
+        ]
+        let attributedString = NSAttributedString(string: "Flips: \(game.flipCount)", attributes: attributes)
+        flipCountLabel.attributedText = attributedString
         scoreLabel.text = "Score: \(game.score)"
     }
 
@@ -82,11 +88,12 @@ class ConcentrationViewController: UIViewController {
         
         // swift never does any automatic type conversion
         // use type initializers
-        if emoji[card.identifier] == nil {
+        if emoji[card] == nil {
             if emojiChoices.count > 0 {
                 let randomIndex = emojiChoices.count.arc4random
                 // remove(at:) returns the thing it removes
-                emoji[card.identifier] = emojiChoices.remove(at: randomIndex)
+                let randomStringIndex = emojiChoices.index(emojiChoices.startIndex, offsetBy: randomIndex)
+                emoji[card] = String(emojiChoices.remove(at: randomStringIndex)) // becaues returns Character
             }
             
         }
@@ -97,12 +104,12 @@ class ConcentrationViewController: UIViewController {
 //        return "?"
         
         // return emoji[card.identifier] if not nil, otherwise return "?"
-        return emoji[card.identifier] ?? "?"
+        return emoji[card] ?? "?"
     }
     
     private func newGame() {
         emojiChoices = Theme.getTheme()
-        emoji = Dictionary<Int, String>()
+        emoji = Dictionary<Card, String>()
         game = ConcentrationModel(numberOfPairsOfCards: numberOfPairsOfCards)
         
         updateViewFromModel()
