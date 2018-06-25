@@ -12,19 +12,28 @@ class ConcentrationViewController: UIViewController {
     
     // ! doesn't have to be initialized
     // no error saying we need an init()
-    @IBOutlet weak var flipCountLabel: UILabel!
-    @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet private weak var flipCountLabel: UILabel!
+    @IBOutlet private weak var scoreLabel: UILabel!
     
     // outlet collection
     // array of UIButtons
-    @IBOutlet var cardButtons: [UIButton]!
+    @IBOutlet private var cardButtons: [UIButton]!
     
     // lazy doesnt actually initialize until some one tries to use game
     // lazy cannot have property observer (the didSet)
-    lazy var game = ConcentrationModel(numberOfPairsOfCards: 2)
+    private lazy var game = ConcentrationModel(numberOfPairsOfCards: 2)
+    
+    // not settable
+    var numberOfPairsOfCards: Int {
+        // if you have a read only property (get only), you don't need the word get
+        // if you also have a set you can't do that
+        get {
+            return (cardButtons.count + 1) / 2
+        }
+    }
 
-    var emoji = Dictionary<Int, String>()
-    var emojiChoices = [String]()
+    private var emoji = Dictionary<Int, String>()
+    private var emojiChoices = [String]()
     
 //    var flipCount: Int = 0 {
 //        didSet {
@@ -51,7 +60,7 @@ class ConcentrationViewController: UIViewController {
         }
     }
     
-    func updateViewFromModel() {
+    private func updateViewFromModel() {
         for index in cardButtons.indices {
             let button = cardButtons[index]
             let card = game.cards[index]
@@ -69,13 +78,13 @@ class ConcentrationViewController: UIViewController {
     }
 
     
-    func emoji(for card: Card) -> String {
+    private func emoji(for card: Card) -> String {
         
         // swift never does any automatic type conversion
         // use type initializers
         if emoji[card.identifier] == nil {
             if emojiChoices.count > 0 {
-                let randomIndex = Int(arc4random_uniform(UInt32(emojiChoices.count)))
+                let randomIndex = emojiChoices.count.arc4random
                 // remove(at:) returns the thing it removes
                 emoji[card.identifier] = emojiChoices.remove(at: randomIndex)
             }
@@ -91,10 +100,10 @@ class ConcentrationViewController: UIViewController {
         return emoji[card.identifier] ?? "?"
     }
     
-    func newGame() {
+    private func newGame() {
         emojiChoices = ["🍉", "🥝", "🍇", "🍋", "🍓", "🥥", "🍊", "🍏"]
         emoji = Dictionary<Int, String>()
-        game = ConcentrationModel(numberOfPairsOfCards: (cardButtons.count + 1) / 2)
+        game = ConcentrationModel(numberOfPairsOfCards: numberOfPairsOfCards)
         
         updateViewFromModel()
         
@@ -102,6 +111,20 @@ class ConcentrationViewController: UIViewController {
     
     @IBAction func newGamePressed(_ sender: UIButton) {
         newGame()
+    }
+}
+
+extension Int {
+    var arc4random: Int {
+        if self > 0 {
+            return Int(arc4random_uniform(UInt32(self)))
+        }
+        else if self < 0 {
+            return -Int(arc4random_uniform(UInt32(abs(self))))
+        }
+        else {
+            return 0
+        }
     }
 }
 

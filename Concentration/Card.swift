@@ -26,11 +26,11 @@ struct Card {
     var identifier: Int
     var flippedBefore = false
     
-    static var identifierFactory = 0
+    private static var identifierFactory = 0
     
     // static method belongs to type, not to instance
     // utility function tied to the type
-    static func getUniqueIdentifier() -> Int {
+    private static func getUniqueIdentifier() -> Int {
         identifierFactory += 1
         // don't need Card. because we are in static method
         // accessing static property

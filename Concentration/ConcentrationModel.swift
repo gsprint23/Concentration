@@ -10,10 +10,31 @@ import Foundation
 
 class ConcentrationModel {
     
-    var cards = Array<Card>() // initialize to empty array
+    private(set) var cards = Array<Card>() // initialize to empty array
     // var cards = [Card]()
     
-    var indexOfOneAndOnlyFaceUpCard: Int?
+    private var indexOfOneAndOnlyFaceUpCard: Int? {
+        get {
+            var foundIndex: Int?
+            for index in cards.indices {
+                if cards[index].isFaceUp {
+                    if foundIndex == nil {
+                        foundIndex = index
+                    }
+                    else {
+                        // found more than one card face up
+                        return nil
+                    }
+                }
+            }
+            return foundIndex
+        }
+        set(newValue) {
+            for index in cards.indices {
+                cards[index].isFaceUp = (index == newValue)
+            }
+        }
+    }
     
     var flipCount = 0
     var score = 0
@@ -21,6 +42,7 @@ class ConcentrationModel {
     // classes get free init as long as all properties are initialized
     
     init(numberOfPairsOfCards: Int) {
+        assert(numberOfPairsOfCards > 0, "Concentration.init(numberOfPairsOfCards: \(index)): must have at least one number of pairs of cards")
         // ..< ... countable ranges
         for _ in 0..<numberOfPairsOfCards {
             let card = Card()
@@ -50,6 +72,7 @@ class ConcentrationModel {
     }
     
     func chooseCard(at index: Int) {
+        assert(cards.indices.contains(index), "Concentration.chooseCard(at: \(index)): chosen index not in the cards array")
         //cards[index].isFaceUp = !cards[index].isFaceUp
         if !cards[index].matched {
             if let matchIndex = indexOfOneAndOnlyFaceUpCard, matchIndex != index {
@@ -61,16 +84,10 @@ class ConcentrationModel {
                     score += 2
                 }
                 cards[index].isFaceUp = true
-                // no longer just one card face up
-                indexOfOneAndOnlyFaceUpCard = nil
             }
             else {
                 // either no cards or 2 cards are face up
                 // turn all cards face down
-                for flipDownIndex in cards.indices {
-                    cards[flipDownIndex].isFaceUp = false
-                }
-                cards[index].isFaceUp = true
                 indexOfOneAndOnlyFaceUpCard = index
             }
         }
