@@ -21,7 +21,7 @@ class ConcentrationViewController: UIViewController {
     
     // lazy doesnt actually initialize until some one tries to use game
     // lazy cannot have property observer (the didSet)
-    private lazy var game = ConcentrationModel(numberOfPairsOfCards: 2)
+    private lazy var game = ConcentrationModel(numberOfPairsOfCards: numberOfPairsOfCards)
     
     // not settable
     var numberOfPairsOfCards: Int {
@@ -32,8 +32,16 @@ class ConcentrationViewController: UIViewController {
         }
     }
 
+    var theme: String? {
+        didSet {
+            emojiChoices = theme ?? ""
+            emoji = Dictionary<Card, String>()
+            
+            updateViewFromModel()
+        }
+    }
     private var emoji = Dictionary<Card, String>()
-    private var emojiChoices = String()
+    private var emojiChoices = Theme.getTheme()
     
 //    var flipCount: Int = 0 {
 //        didSet {
@@ -61,26 +69,29 @@ class ConcentrationViewController: UIViewController {
     }
     
     private func updateViewFromModel() {
-        for index in cardButtons.indices {
-            let button = cardButtons[index]
-            let card = game.cards[index]
-            if card.isFaceUp {
-                button.setTitle(emoji(for: card), for: UIControlState.normal)
-                button.backgroundColor = UIColor.white
+        if cardButtons != nil {
+            for index in cardButtons.indices {
+                let button = cardButtons[index]
+                let card = game.cards[index]
+                if card.isFaceUp {
+                    button.setTitle(emoji(for: card), for: UIControlState.normal)
+                    button.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
+                }
+                else {
+                    button.setTitle("", for: UIControlState.normal)
+                    button.backgroundColor = card.matched ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0) : #colorLiteral(red: 0.3647058904, green: 0.06666667014, blue: 0.9686274529, alpha: 1)
+                }
             }
-            else {
-                button.setTitle("", for: UIControlState.normal)
-                button.backgroundColor = card.matched ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0) : #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
-            }
-        }
-        let attributes: [NSAttributedStringKey : Any] = [
-            .strokeWidth : 5.0,
-            .strokeColor : #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
+            let attributes: [NSAttributedStringKey : Any] = [
+                .strokeWidth : 5.0,
+                .strokeColor : #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
 
-        ]
-        let attributedString = NSAttributedString(string: "Flips: \(game.flipCount)", attributes: attributes)
-        flipCountLabel.attributedText = attributedString
-        scoreLabel.text = "Score: \(game.score)"
+            ]
+            let attributedString = NSAttributedString(string: "Flips: \(game.flipCount)", attributes: attributes)
+            flipCountLabel.attributedText = attributedString
+            scoreLabel.text = "Score: \(game.score)"
+            
+        }
     }
 
     
@@ -108,12 +119,10 @@ class ConcentrationViewController: UIViewController {
     }
     
     private func newGame() {
-        emojiChoices = Theme.getTheme()
-        emoji = Dictionary<Card, String>()
+        // letting user choose theme now instead of random
+        //theme = Theme.getTheme()
         game = ConcentrationModel(numberOfPairsOfCards: numberOfPairsOfCards)
-        
         updateViewFromModel()
-        
     }
     
     @IBAction func newGamePressed(_ sender: UIButton) {
